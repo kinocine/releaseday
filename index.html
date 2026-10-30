@@ -67,7 +67,8 @@
       cursor: pointer; 
       transition: background 0.15s;
     }
-    .nav-btn:hover { background: #f1f3f4; }
+    .nav-btn:hover:not(:disabled) { background: #f1f3f4; }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
 
     /* 오늘 날짜 표시 및 기준 이동 버튼 */
     .date-indicator {
@@ -125,9 +126,9 @@
       padding: 4px 6px; 
       border-radius: 5px; 
       white-space: nowrap; 
-      flex-shrink: 0;
-      min-width: 66px;
-      text-align: center;
+      flex-shrink: 0; 
+      min-width: 66px; 
+      text-align: center; 
     }
     .date-badge.tbd { color: #5f6368; background: #f1f3f4; }
     
@@ -136,9 +137,9 @@
       flex: 1; 
       min-width: 0; 
       cursor: pointer; 
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
+      display: flex; 
+      align-items: baseline; 
+      gap: 4px; 
     }
     .title-area:hover .title { color: var(--primary); }
     .title-area .title { 
@@ -155,7 +156,7 @@
       white-space: nowrap; 
       overflow: hidden; 
       text-overflow: ellipsis; 
-      flex-shrink: 1;
+      flex-shrink: 1; 
     }
     
     /* 아이콘 링크 영역 (우측 3개) */
@@ -175,7 +176,7 @@
       text-decoration: none; 
       font-size: 12px; 
       background: #f1f3f4; 
-      transition: transform 0.1s;
+      transition: transform 0.1s; 
     }
     .link-badge:hover { transform: scale(1.1); }
     .link-badge.active { background: #e8f0fe; }
@@ -198,8 +199,8 @@
       box-shadow: 0 4px 10px rgba(26,115,232,0.3); 
       border: none; 
       cursor: pointer; 
-      transition: transform 0.2s, background 0.2s;
-      z-index: 99;
+      transition: transform 0.2s, background 0.2s; 
+      z-index: 99; 
     }
     .fab:hover { transform: scale(1.06); background: #1557b0; }
 
@@ -221,14 +222,14 @@
   <header>
     <div class="header-inner">
       <div class="search-box">
-        <input type="text" id="searchInput" placeholder="영화 제목/원제 검색..." oninput="filterAndRender()">
+        <input type="text" id="searchInput" placeholder="영화 제목/원제 검색..." oninput="onSearchInput()">
       </div>
       <div class="nav-bar">
-        <button class="nav-btn" onclick="shiftMonth(-1)" title="이전달">◀</button>
-        <div class="date-indicator" id="currentPeriodLabel" onclick="resetToTodayClosest()" title="오늘 기준으로 이동">
-          2026년 10월 30일
+        <button class="nav-btn" id="prevBtn" onclick="shiftItems(-10)" title="이전 10개">◀</button>
+        <div class="date-indicator" id="currentPeriodLabel" onclick="resetToTodayClosest()" title="오늘 기준으로 초기화">
+          <!-- 항상 실제 오늘 날짜 표시 -->
         </div>
-        <button class="nav-btn" onclick="shiftMonth(1)" title="다음달">▶</button>
+        <button class="nav-btn" id="nextBtn" onclick="shiftItems(10)" title="다음 10개">▶</button>
       </div>
     </div>
   </header>
@@ -276,18 +277,21 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyeeYeI3RnJo9fPFUMc1Tul55RcXt000_OxnAYcwz2vtg1F0a-ln2SANFN47qfXThVa7A/exec";
 
+    const PAGE_SIZE = 10;
     let allMovies = [];
-    let baseDate = new Date();
+    let startIndex = 0; // 현재 10개 묶음의 시작 인덱스
 
     window.onload = function() {
-      updateDateLabel();
+      setTodayIndicatorLabel();
       fetchMovies();
     };
 
-    function updateDateLabel() {
-      const year = baseDate.getFullYear();
-      const month = String(baseDate.getMonth() + 1).padStart(2, '0');
-      const date = String(baseDate.getDate()).padStart(2, '0');
+    // 상단 텍스트는 항상 '실제 오늘 날짜'로 고정
+    function setTodayIndicatorLabel() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const date = String(today.getDate()).padStart(2, '0');
       document.getElementById('currentPeriodLabel').innerText = `${year}년 ${month}월 ${date}일`;
     }
 
@@ -297,7 +301,13 @@
         .then(res => {
           if (res.status === 'success') {
             allMovies = res.data;
-            filterAndRender();
+            // 전체 날짜 오름차순 정렬 (미정 날짜는 뒤로 배치)
+            allMovies.sort((a, b) => {
+              if (!a.releaseDate) return 1;
+              if (!b.releaseDate) return -1;
+              return a.releaseDate.localeCompare(b.releaseDate);
+            });
+            resetToTodayClosest();
           }
         })
         .catch(err => console.error("데이터 로드 오류:", err));
@@ -317,35 +327,66 @@
       return dateStr;
     }
 
-    function filterAndRender() {
+    // 현재 검색어에 매칭되는 전체 영화 목록 반환
+    function getFilteredPool() {
       const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-      const bYear = baseDate.getFullYear();
-      const bMonth = baseDate.getMonth() + 1;
+      if (!keyword) return allMovies;
+      return allMovies.filter(m => 
+        (m.title && m.title.toLowerCase().includes(keyword)) || 
+        (m.origTitle && m.origTitle.toLowerCase().includes(keyword))
+      );
+    }
 
-      // 검색어가 없을 때는 현재 조회 중인 월(전후 1개월 포함)을 기준으로 목록 필터
-      const filtered = allMovies.filter(m => {
-        const matchTitle = m.title.toLowerCase().includes(keyword) || (m.origTitle && m.origTitle.toLowerCase().includes(keyword));
-        if (keyword) return matchTitle;
+    // 10개씩 이동 (delta: -10 또는 +10)
+    function shiftItems(delta) {
+      const pool = getFilteredPool();
+      const newIndex = startIndex + delta;
 
-        if (!m.releaseDate) return false;
-        const parts = m.releaseDate.substring(0, 10).split('-');
-        if (parts.length < 2) return false;
-        const mYear = Number(parts[0]);
-        const mMonth = Number(parts[1]);
+      if (newIndex >= 0 && newIndex < pool.length) {
+        startIndex = newIndex;
+        renderList();
+      }
+    }
 
-        return (mYear === bYear && mMonth === bMonth);
-      });
+    function onSearchInput() {
+      startIndex = 0;
+      renderList();
+    }
 
-      // 날짜 오름차순 정렬
-      filtered.sort((a, b) => (a.releaseDate || '').localeCompare(b.releaseDate || ''));
+    // 오늘 날짜 이후 가장 가까운 영화를 찾아 startIndex로 설정
+    function resetToTodayClosest() {
+      document.getElementById('searchInput').value = '';
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
+      // 오늘 날짜 이상인 첫 번째 영화 인덱스 검색
+      const idx = allMovies.findIndex(m => m.releaseDate && m.releaseDate.substring(0, 10) >= todayStr);
+      if (idx !== -1) {
+        startIndex = idx;
+      } else {
+        // 미래 영화가 없으면 마지막 10개 구간으로 이동
+        startIndex = Math.max(0, allMovies.length - PAGE_SIZE);
+      }
+
+      renderList();
+    }
+
+    function renderList() {
+      const pool = getFilteredPool();
       const container = document.getElementById('timelineContainer');
       container.innerHTML = '';
 
-      if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding: 50px 20px; color: #888;">해당 기간에 등록된 개봉 영화가 없습니다.</div>';
+      // 버튼 활성/비활성화 처리
+      document.getElementById('prevBtn').disabled = (startIndex <= 0);
+      document.getElementById('nextBtn').disabled = (startIndex + PAGE_SIZE >= pool.length);
+
+      if (pool.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding: 50px 20px; color: #888;">등록된 개봉 영화가 없습니다.</div>';
         return;
       }
+
+      // 10개 슬라이싱
+      const pageItems = pool.slice(startIndex, startIndex + PAGE_SIZE);
 
       const card = document.createElement('div');
       card.className = 'movie-list-card';
@@ -353,7 +394,7 @@
       const ul = document.createElement('ul');
       ul.className = 'movie-list';
 
-      filtered.forEach(movie => {
+      pageItems.forEach(movie => {
         const li = document.createElement('li');
         li.className = 'movie-item';
         
@@ -374,38 +415,6 @@
 
       card.appendChild(ul);
       container.appendChild(card);
-    }
-
-    function shiftMonth(delta) {
-      baseDate.setMonth(baseDate.getMonth() + delta);
-      updateDateLabel();
-      filterAndRender();
-    }
-
-    // 오늘 날짜 기준 가장 가까운 개봉일로 baseDate를 맞추고 렌더링
-    function resetToTodayClosest() {
-      const today = new Date();
-      const todayStr = today.toISOString().split('T')[0];
-      document.getElementById('searchInput').value = '';
-
-      if (allMovies.length > 0) {
-        // 오늘 이후 가장 빠른 개봉작 검색
-        const futureMovies = allMovies
-          .filter(m => m.releaseDate && m.releaseDate.substring(0, 10) >= todayStr)
-          .sort((a, b) => a.releaseDate.localeCompare(b.releaseDate));
-
-        if (futureMovies.length > 0) {
-          const parts = futureMovies[0].releaseDate.substring(0, 10).split('-');
-          baseDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-        } else {
-          baseDate = today;
-        }
-      } else {
-        baseDate = today;
-      }
-
-      updateDateLabel();
-      filterAndRender();
     }
 
     function openModal(id = null) {
@@ -461,7 +470,14 @@
         allMovies.push(movieData);
       }
 
-      filterAndRender();
+      // 저장 후 재정렬
+      allMovies.sort((a, b) => {
+        if (!a.releaseDate) return 1;
+        if (!b.releaseDate) return -1;
+        return a.releaseDate.localeCompare(b.releaseDate);
+      });
+
+      renderList();
       closeModal();
 
       fetch(GAS_URL, {
