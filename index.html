@@ -12,17 +12,16 @@
       --border: #e8eaed;
       --text: #202124;
       --subtext: #5f6368;
-      --highlight: #f1f3f4;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif; 
       background: var(--bg); 
       color: var(--text); 
-      padding-bottom: 80px; 
+      padding-bottom: 90px; 
     }
     
-    /* 상단 헤더 & 컨트롤 (PC에서 중앙 정렬 및 최대폭 설정) */
+    /* 상단 헤더 & 컨트롤 */
     header { 
       position: sticky; 
       top: 0; 
@@ -32,14 +31,14 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.04); 
     }
     .header-inner {
-      max-width: 900px;
+      max-width: 720px;
       margin: 0 auto;
-      padding: 12px 16px;
+      padding: 10px 14px;
     }
-    .search-box { display: flex; gap: 8px; margin-bottom: 10px; }
+    .search-box { margin-bottom: 8px; }
     .search-box input { 
-      flex: 1; 
-      padding: 9px 14px; 
+      width: 100%;
+      padding: 9px 12px; 
       border: 1px solid var(--border); 
       border-radius: 8px; 
       font-size: 14px; 
@@ -47,85 +46,125 @@
       background: #fdfdfd;
       transition: all 0.2s;
     }
-    .search-box input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 2px rgba(26,115,232,0.15); }
+    .search-box input:focus { border-color: var(--primary); background: #fff; }
     
-    .nav-bar { display: flex; align-items: center; justify-content: space-between; }
-    .nav-bar h2 { font-size: 16px; font-weight: 700; color: #111; }
-    .btn { padding: 6px 12px; border: 1px solid var(--border); background: #fff; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-    .btn:hover { background: #f1f3f4; }
-    .btn-primary { background: var(--primary); color: #fff; border: none; }
-    .btn-primary:hover { background: #1557b0; }
-    
-    /* 본문 컨테이너 (PC에서 최대 900px 중앙 정렬) */
-    .container { 
-      max-width: 900px; 
-      margin: 16px auto 0 auto; 
-      padding: 0 16px; 
+    .nav-bar { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      gap: 8px;
     }
-    .week-group { 
-      margin-bottom: 18px; 
-      background: var(--card-bg); 
-      border-radius: 10px; 
+    .nav-btn { 
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: center; 
+      width: 38px; 
+      height: 34px; 
       border: 1px solid var(--border); 
-      overflow: hidden; 
+      background: #fff; 
+      border-radius: 6px; 
+      font-size: 14px; 
+      cursor: pointer; 
+      transition: background 0.15s;
+    }
+    .nav-btn:hover { background: #f1f3f4; }
+
+    /* 오늘 날짜 표시 및 기준 이동 버튼 */
+    .date-indicator {
+      flex: 1;
+      text-align: center;
+      background: #f1f3f4;
+      border: 1px solid transparent;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #111;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .date-indicator:hover {
+      background: #e8f0fe;
+      color: var(--primary);
+    }
+    
+    /* 영화 목록 본문 */
+    .container { 
+      max-width: 720px; 
+      margin: 10px auto 0 auto; 
+      padding: 0 12px; 
+    }
+    .movie-list-card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow: hidden;
       box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
-    .week-header { 
-      padding: 9px 14px; 
-      background: #f8f9fa; 
-      font-size: 13px; 
-      font-weight: 700; 
-      color: var(--subtext); 
-      display: flex; 
-      justify-content: space-between; 
-      border-bottom: 1px solid var(--border);
-    }
-    .week-header.current-month { 
-      background: #e8f0fe; 
-      color: var(--primary); 
-      border-left: 4px solid var(--primary); 
-    }
-    
-    /* 영화 아이템 카드 (한 줄 정렬 및 PC 호버 효과) */
     .movie-list { list-style: none; }
+    
+    /* 한 줄 정렬: [날짜] [제목(클릭시 수정)] [링크 3개] */
     .movie-item { 
-      padding: 10px 14px; 
+      padding: 11px 12px; 
       border-bottom: 1px solid #f1f3f4; 
       display: flex; 
-      justify-content: space-between; 
       align-items: center; 
-      gap: 12px; 
+      gap: 10px; 
       transition: background 0.15s;
     }
     .movie-item:last-child { border-bottom: none; }
-    .movie-item:hover { background: #fbfbfd; }
-    
-    .title-area { 
-      flex: 1; 
-      min-width: 0; 
-      display: flex; 
-      align-items: baseline; 
-      gap: 6px; 
-      cursor: pointer; 
-    }
-    .title-area:hover .title { color: var(--primary); }
-    .title-area .title { font-size: 14px; font-weight: 600; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .title-area .orig-title { font-size: 12px; color: var(--subtext); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    
-    /* 우측 컨트롤 영역 (날짜 + 링크 + 수정버튼) */
-    .item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .movie-item:hover { background: #fafafc; }
+
+    /* 날짜 배지 (좌측) */
     .date-badge { 
       font-size: 12px; 
-      font-weight: 600; 
+      font-weight: 700; 
       color: #d93025; 
       background: #fce8e6; 
-      padding: 3px 7px; 
+      padding: 4px 6px; 
       border-radius: 5px; 
       white-space: nowrap; 
+      flex-shrink: 0;
+      min-width: 66px;
+      text-align: center;
     }
     .date-badge.tbd { color: #5f6368; background: #f1f3f4; }
     
-    .links-area { display: flex; gap: 4px; align-items: center; }
+    /* 제목 영역 (중앙, 클릭 시 수정 모달 오픈) */
+    .title-area { 
+      flex: 1; 
+      min-width: 0; 
+      cursor: pointer; 
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .title-area:hover .title { color: var(--primary); }
+    .title-area .title { 
+      font-size: 14px; 
+      font-weight: 600; 
+      color: #111; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+    }
+    .title-area .orig-title { 
+      font-size: 12px; 
+      color: var(--subtext); 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+      flex-shrink: 1;
+    }
+    
+    /* 아이콘 링크 영역 (우측 3개) */
+    .links-area { 
+      display: flex; 
+      gap: 5px; 
+      align-items: center; 
+      flex-shrink: 0; 
+    }
     .link-badge { 
       display: inline-flex; 
       align-items: center; 
@@ -134,35 +173,19 @@
       height: 24px; 
       border-radius: 5px; 
       text-decoration: none; 
-      font-size: 11px; 
-      background: #f1f3f4; 
-      color: #333; 
-      transition: background 0.15s, transform 0.1s;
-    }
-    .link-badge:hover { transform: scale(1.08); }
-    .link-badge.active { background: #e8f0fe; color: var(--primary); font-weight: bold; }
-    
-    .btn-edit { 
-      display: inline-flex; 
-      align-items: center; 
-      justify-content: center; 
-      width: 24px; 
-      height: 24px; 
-      border-radius: 5px; 
-      border: 1px solid var(--border); 
-      background: #fff; 
-      cursor: pointer; 
       font-size: 12px; 
-      padding: 0; 
-      transition: all 0.15s;
+      background: #f1f3f4; 
+      transition: transform 0.1s;
     }
-    .btn-edit:hover { background: #f1f3f4; transform: scale(1.08); }
+    .link-badge:hover { transform: scale(1.1); }
+    .link-badge.active { background: #e8f0fe; }
+    .link-badge.disabled { opacity: 0.2; pointer-events: none; }
     
     /* 하단 플로팅 등록 버튼 */
     .fab { 
       position: fixed; 
       bottom: 24px; 
-      right: 24px; 
+      right: 20px; 
       background: var(--primary); 
       color: white; 
       width: 48px; 
@@ -176,6 +199,7 @@
       border: none; 
       cursor: pointer; 
       transition: transform 0.2s, background 0.2s;
+      z-index: 99;
     }
     .fab:hover { transform: scale(1.06); background: #1557b0; }
 
@@ -188,6 +212,8 @@
     .input-row input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; outline: none; }
     .input-row input:focus { border-color: var(--primary); }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    .btn { padding: 6px 12px; border: 1px solid var(--border); background: #fff; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-primary { background: var(--primary); color: #fff; border: none; }
   </style>
 </head>
 <body>
@@ -198,12 +224,11 @@
         <input type="text" id="searchInput" placeholder="영화 제목/원제 검색..." oninput="filterAndRender()">
       </div>
       <div class="nav-bar">
-        <button class="btn" onclick="shiftMonth(-1)">◀ 이전달</button>
-        <h2 id="currentPeriodLabel">2026년 10월 기준</h2>
-        <div>
-          <button class="btn" onclick="resetToday()" title="현재 월 및 검색 초기화">오늘</button>
-          <button class="btn" onclick="shiftMonth(1)">다음달 ▶</button>
+        <button class="nav-btn" onclick="shiftMonth(-1)" title="이전달">◀</button>
+        <div class="date-indicator" id="currentPeriodLabel" onclick="resetToTodayClosest()" title="오늘 기준으로 이동">
+          2026년 10월 30일
         </div>
+        <button class="nav-btn" onclick="shiftMonth(1)" title="다음달">▶</button>
       </div>
     </div>
   </header>
@@ -255,8 +280,16 @@
     let baseDate = new Date();
 
     window.onload = function() {
+      updateDateLabel();
       fetchMovies();
     };
+
+    function updateDateLabel() {
+      const year = baseDate.getFullYear();
+      const month = String(baseDate.getMonth() + 1).padStart(2, '0');
+      const date = String(baseDate.getDate()).padStart(2, '0');
+      document.getElementById('currentPeriodLabel').innerText = `${year}년 ${month}월 ${date}일`;
+    }
 
     function fetchMovies() {
       fetch(GAS_URL)
@@ -270,7 +303,7 @@
         .catch(err => console.error("데이터 로드 오류:", err));
     }
 
-    // 날짜 포맷팅: MM-DD (요일)
+    // 날짜 포맷: MM-DD (요일)
     function formatDisplayDate(dateStr) {
       if (!dateStr || dateStr.length < 10) return '미정';
       const cleanDate = dateStr.substring(0, 10);
@@ -284,133 +317,94 @@
       return dateStr;
     }
 
-    // 주차 계산
-    function getWeekInfo(dateStr) {
-      if (!dateStr || dateStr.length < 10) return { label: '미정', order: 999999 };
-      const cleanDate = dateStr.substring(0, 10);
-      const parts = cleanDate.split('-');
-      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-      
-      const year = d.getFullYear();
-      const month = d.getMonth() + 1;
-      
-      const firstDay = new Date(year, d.getMonth(), 1);
-      const firstDayOfWeek = firstDay.getDay();
-      const weekNo = Math.ceil((d.getDate() + firstDayOfWeek) / 7);
-
-      return {
-        year: year,
-        month: month,
-        week: weekNo,
-        label: `${year}년 ${month}월 W${weekNo}`,
-        order: year * 1000 + month * 10 + weekNo
-      };
-    }
-
-    function isWithinVisibleWindow(year, month, week, bYear, bMonth) {
-      if (year === bYear && month === bMonth) return true;
-      
-      const prevDate = new Date(bYear, bMonth - 2, 1);
-      const pYear = prevDate.getFullYear();
-      const pMonth = prevDate.getMonth() + 1;
-      if (year === pYear && month === pMonth && week >= 3) return true;
-
-      const nextDate = new Date(bYear, bMonth, 1);
-      const nYear = nextDate.getFullYear();
-      const nMonth = nextDate.getMonth() + 1;
-      if (year === nYear && month === nMonth && week <= 2) return true;
-
-      return false;
-    }
-
     function filterAndRender() {
       const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
       const bYear = baseDate.getFullYear();
       const bMonth = baseDate.getMonth() + 1;
 
-      document.getElementById('currentPeriodLabel').innerText = `${bYear}년 ${bMonth}월 기준`;
-
+      // 검색어가 없을 때는 현재 조회 중인 월(전후 1개월 포함)을 기준으로 목록 필터
       const filtered = allMovies.filter(m => {
         const matchTitle = m.title.toLowerCase().includes(keyword) || (m.origTitle && m.origTitle.toLowerCase().includes(keyword));
         if (keyword) return matchTitle;
 
-        const w = getWeekInfo(m.releaseDate);
-        return isWithinVisibleWindow(w.year, w.month, w.week, bYear, bMonth);
+        if (!m.releaseDate) return false;
+        const parts = m.releaseDate.substring(0, 10).split('-');
+        if (parts.length < 2) return false;
+        const mYear = Number(parts[0]);
+        const mMonth = Number(parts[1]);
+
+        return (mYear === bYear && mMonth === bMonth);
       });
 
-      const groups = {};
-      filtered.forEach(m => {
-        const w = getWeekInfo(m.releaseDate);
-        if (!groups[w.label]) {
-          groups[w.label] = {
-            label: w.label,
-            order: w.order,
-            isCurrentMonth: (w.year === bYear && w.month === bMonth),
-            items: []
-          };
-        }
-        groups[w.label].items.push(m);
-      });
-
-      const sortedKeys = Object.keys(groups).sort((a, b) => groups[a].order - groups[b].order);
+      // 날짜 오름차순 정렬
+      filtered.sort((a, b) => (a.releaseDate || '').localeCompare(b.releaseDate || ''));
 
       const container = document.getElementById('timelineContainer');
       container.innerHTML = '';
 
-      if (sortedKeys.length === 0) {
+      if (filtered.length === 0) {
         container.innerHTML = '<div style="text-align:center; padding: 50px 20px; color: #888;">해당 기간에 등록된 개봉 영화가 없습니다.</div>';
         return;
       }
 
-      sortedKeys.forEach(k => {
-        const g = groups[k];
-        const groupEl = document.createElement('div');
-        groupEl.className = 'week-group';
+      const card = document.createElement('div');
+      card.className = 'movie-list-card';
 
-        groupEl.innerHTML = `
-          <div class="week-header ${g.isCurrentMonth ? 'current-month' : ''}">
-            <span>${g.label}</span>
-            <span>${g.items.length}편</span>
+      const ul = document.createElement('ul');
+      ul.className = 'movie-list';
+
+      filtered.forEach(movie => {
+        const li = document.createElement('li');
+        li.className = 'movie-item';
+        
+        li.innerHTML = `
+          <span class="date-badge ${!movie.releaseDate ? 'tbd' : ''}">${formatDisplayDate(movie.releaseDate)}</span>
+          <div class="title-area" onclick="openModal('${movie.id}')" title="클릭하여 수정">
+            <span class="title">${escapeHtml(movie.title)}</span>
+            ${movie.origTitle ? `<span class="orig-title">(${escapeHtml(movie.origTitle)})</span>` : ''}
           </div>
-          <ul class="movie-list"></ul>
+          <div class="links-area">
+            ${movie.link1 ? `<a href="${movie.link1}" target="_blank" class="link-badge active" title="정보">ℹ️</a>` : `<span class="link-badge disabled">ℹ️</span>`}
+            ${movie.link2 ? `<a href="${movie.link2}" target="_blank" class="link-badge active" title="영상">🎬</a>` : `<span class="link-badge disabled">🎬</span>`}
+            ${movie.link3 ? `<a href="${movie.link3}" target="_blank" class="link-badge active" title="리뷰">📝</a>` : `<span class="link-badge disabled">📝</span>`}
+          </div>
         `;
-
-        const listEl = groupEl.querySelector('.movie-list');
-        g.items.sort((a, b) => (a.releaseDate || '').localeCompare(b.releaseDate || ''));
-
-        g.items.forEach(movie => {
-          const li = document.createElement('li');
-          li.className = 'movie-item';
-          
-          li.innerHTML = `
-            <div class="title-area" onclick="openModal('${movie.id}')" title="클릭하여 수정">
-              <span class="title">${escapeHtml(movie.title)}</span>
-              ${movie.origTitle ? `<span class="orig-title">(${escapeHtml(movie.origTitle)})</span>` : ''}
-            </div>
-            <div class="item-right">
-              <span class="date-badge ${!movie.releaseDate ? 'tbd' : ''}">${formatDisplayDate(movie.releaseDate)}</span>
-              <div class="links-area">
-                ${movie.link1 ? `<a href="${movie.link1}" target="_blank" class="link-badge active" title="정보">ℹ️</a>` : `<span class="link-badge" style="opacity:0.2">ℹ️</span>`}
-                ${movie.link2 ? `<a href="${movie.link2}" target="_blank" class="link-badge active" title="영상">🎬</a>` : `<span class="link-badge" style="opacity:0.2">🎬</span>`}
-                ${movie.link3 ? `<a href="${movie.link3}" target="_blank" class="link-badge active" title="리뷰">📝</a>` : `<span class="link-badge" style="opacity:0.2">📝</span>`}
-              </div>
-              <button class="btn-edit" onclick="openModal('${movie.id}')" title="수정">✏️</button>
-            </div>
-          `;
-          listEl.appendChild(li);
-        });
-
-        container.appendChild(groupEl);
+        ul.appendChild(li);
       });
+
+      card.appendChild(ul);
+      container.appendChild(card);
     }
 
     function shiftMonth(delta) {
       baseDate.setMonth(baseDate.getMonth() + delta);
+      updateDateLabel();
       filterAndRender();
     }
-    function resetToday() {
-      baseDate = new Date();
+
+    // 오늘 날짜 기준 가장 가까운 개봉일로 baseDate를 맞추고 렌더링
+    function resetToTodayClosest() {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
       document.getElementById('searchInput').value = '';
+
+      if (allMovies.length > 0) {
+        // 오늘 이후 가장 빠른 개봉작 검색
+        const futureMovies = allMovies
+          .filter(m => m.releaseDate && m.releaseDate.substring(0, 10) >= todayStr)
+          .sort((a, b) => a.releaseDate.localeCompare(b.releaseDate));
+
+        if (futureMovies.length > 0) {
+          const parts = futureMovies[0].releaseDate.substring(0, 10).split('-');
+          baseDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        } else {
+          baseDate = today;
+        }
+      } else {
+        baseDate = today;
+      }
+
+      updateDateLabel();
       filterAndRender();
     }
 
